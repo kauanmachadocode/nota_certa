@@ -7,9 +7,13 @@ export default function Home() {
   const [alunos, setAlunos] = useState<Aluno[]>([])
   const [nome, setNome] = useState('');
   
-  const adicionaAluno = (event: React.FormEvent<HTMLFormElement>) => { event.preventDefault()
+  const adicionaAluno = (event: React.SubmitEvent<HTMLFormElement>) => { event.preventDefault()
+      const nome_valido = nome.trim()
+      if (nome_valido === '') {
+        return;
+      }
       const aluno: Aluno = {id: crypto.randomUUID(),
-        nome: nome
+        nome: nome_valido
       }
       setAlunos([...alunos, aluno]);
       setNome("");
