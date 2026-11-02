@@ -4,16 +4,15 @@ import { Aluno } from "@/types/aluno"
 
 
 export default function Home() {
+  const [alunos, setAlunos] = useState<Aluno[]>([])
   const [nome, setNome] = useState('');
-
-  // TODO(você): estado da lista de alunos (Aluno[])
-
   
   const adicionaAluno = (event: React.FormEvent<HTMLFormElement>) => { event.preventDefault()
       const aluno: Aluno = {id: crypto.randomUUID(),
         nome: nome
       }
-      console.log(aluno)
+      setAlunos([...alunos, aluno]);
+      setNome("");
     }
   // TODO(você): função que atualiza o texto digitado
   return (
@@ -42,15 +41,16 @@ export default function Home() {
         </button>
       </form>
 
-      {/* TODO(você): mostre esta mensagem só quando a lista estiver vazia */}
-      <p className="text-slate-500">Nenhum aluno cadastrado ainda.</p>
+      { alunos.length===0 ? (<p className="text-slate-500">Nenhum aluno cadastrado ainda.</p>) : ( <ul className="space-y-2">
 
-      <ul className="space-y-2">
-        {/* TODO(você): percorra a lista com .map() e renderize um <li> por aluno */}
-        <li className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
-          {/* TODO(você): nome do aluno aqui */}
-        </li>
-      </ul>
+        { alunos.map((aluno) => (<li key={aluno.id} className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          { aluno.nome }
+        </li>)) }
+        
+      </ul>) }
+      
+
+     
     </main>
   );
 }
