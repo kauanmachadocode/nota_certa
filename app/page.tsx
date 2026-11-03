@@ -22,6 +22,8 @@ export default function Home() {
       setErro('');
     }
 
+  const removeAluno = (id: string) => {setAlunos(alunos.filter((aluno)=> aluno.id!==id))}
+
   return (
     <main className="mx-auto max-w-xl p-4 sm:p-8">
       <h1 className="mb-6 text-2xl font-bold text-slate-800">Meus alunos</h1>
@@ -58,9 +60,20 @@ export default function Home() {
 
       { alunos.length===0 ? (<p className="text-slate-500">Nenhum aluno cadastrado ainda.</p>) : ( <ul className="space-y-2">
 
-        { alunos.map((aluno) => (<li key={aluno.id} className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
-          { aluno.nome }
-        </li>)) }
+        { alunos.map((aluno) => (<li
+  key={aluno.id}
+  className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm"
+>
+  <span>{aluno.nome}</span>
+  <button
+    type="button"
+    onClick={() => removeAluno(aluno.id)}
+    aria-label={`Remover ${aluno.nome}`}
+    className="rounded-md px-3 py-1 text-sm font-medium text-red-600 hover:bg-red-50"
+  >
+    Remover
+  </button>
+</li>)) }
         
       </ul>) }
       
