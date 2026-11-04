@@ -1,21 +1,24 @@
 "use client"
 import { useState } from "react";
 import { Aluno } from "@/types/aluno"
+import { nomeValido } from "@/lib/validacao"
 
 
 export default function Home() {
-  const [alunos, setAlunos] = useState<Aluno[]>([])
+  const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [nome, setNome] = useState('');
   const [erro, setErro] = useState('');
+  const [editandoId, setEditandoId] = useState<string | null>(null)
+  const [nomeEdicao, setNomeEdicao] = useState('')
   
   const adicionaAluno = (event: React.SubmitEvent<HTMLFormElement>) => { event.preventDefault()
-      const nomeValido = nome.trim()
-      if (nomeValido === '') {
+      if (!nomeValido(nome)) {
         setErro('Digite o nome corretamente')
         return;
       }
+      const nomeTratado = nome.trim()
       const aluno: Aluno = {id: crypto.randomUUID(),
-        nome: nomeValido
+        nome: nomeTratado
       }
       setAlunos([...alunos, aluno]);
       setNome("");
@@ -23,6 +26,22 @@ export default function Home() {
     }
 
   const removeAluno = (id: string) => {setAlunos(alunos.filter((aluno)=> aluno.id!==id))}
+
+  const iniciaEdicao = (aluno: Aluno) => {
+    setEditandoId(aluno.id);
+    setNomeEdicao(aluno.nome);
+  }
+
+  const cancelaEdicao = ()=>{setEditandoId(null)}
+
+  const salvaEdicao = (id: string) => {
+    if (!nomeValido(nomeEdicao)) {
+      setErro("Digite o nome corretamente")
+      return;
+    }
+    setAlunos(alunos.map((aluno)=>aluno.id===id ? {...aluno, nome: nomeEdicao.trim()} : aluno));
+    setEditandoId(null);
+  }
 
   return (
     <main className="mx-auto max-w-xl p-4 sm:p-8">
@@ -62,22 +81,62 @@ export default function Home() {
 
         { alunos.map((aluno) => (<li
   key={aluno.id}
-  className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm"
+  className="flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm"
 >
-  <span>{aluno.nome}</span>
-  <button
-    type="button"
-    onClick={() => removeAluno(aluno.id)}
-    aria-label={`Remover ${aluno.nome}`}
-    className="rounded-md px-3 py-1 text-sm font-medium text-red-600 hover:bg-red-50"
-  >
-    Remover
-  </button>
-</li>)) }
+  
+  {editandoId===aluno.id ? (
+    <>
+      {/* Modo edição */}
+      <input
+        type="text"
+        aria-label={`Novo nome para ${aluno.nome}`}
+        className="flex-1 rounded-lg border border-slate-300 px-3 py-1 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+        value = {nomeEdicao}
+        onChange={ (event) => {setNomeEdicao(event.target.value), setErro('')} }
         
-      </ul>) }
+      />
+      <div className="flex gap-1">
+        <button
+          type="button"
+          onClick = { ()=>{salvaEdicao(aluno.id)} }
+          className="rounded-md bg-blue-600 px-3 py-1 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Salvar
+        </button>
+        <button
+          type="button"
+          onClick={ cancelaEdicao }
+          className="rounded-md px-3 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100"
+        >
+          Cancelar
+        </button>
+      </div>
+    </>
+  ) : (
+    <>
       
-
+      <span>{aluno.nome}</span>
+      <div className="flex gap-1">
+        <button
+          type="button"
+          onClick={ ()=>iniciaEdicao(aluno) }
+          className="rounded-md px-3 py-1 text-sm font-medium text-blue-600 hover:bg-blue-50"
+        >
+          Editar
+        </button>
+        <button
+          type="button"
+          onClick={() => removeAluno(aluno.id)}
+          aria-label={`Remover ${aluno.nome}`}
+          className="rounded-md px-3 py-1 text-sm font-medium text-red-600 hover:bg-red-50"
+        >
+          Remover
+        </button>
+      </div>
+    </>
+  )}
+</li>))}
+      </ul>) }
      
     </main>
   );
