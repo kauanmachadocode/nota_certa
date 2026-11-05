@@ -1,15 +1,31 @@
 "use client"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Aluno } from "@/types/aluno"
 import { nomeValido } from "@/lib/validacao"
+import { carregaAlunos, salvaAlunos } from "@/services/alunos";
 
 
 export default function Home() {
   const [alunos, setAlunos] = useState<Aluno[]>([]);
+  const [carregado, setCarregado] = useState(false);
   const [nome, setNome] = useState('');
   const [erro, setErro] = useState('');
   const [editandoId, setEditandoId] = useState<string | null>(null)
   const [nomeEdicao, setNomeEdicao] = useState('')
+
+
+  useEffect(()=>{
+    setAlunos(carregaAlunos());
+    setCarregado(true);
+  }, []);
+
+  useEffect(()=>{
+    if (!carregado) {
+      return;
+    }
+    salvaAlunos(alunos);
+  }, [alunos, carregado]);
+  
   
   const adicionaAluno = (event: React.SubmitEvent<HTMLFormElement>) => { event.preventDefault()
       if (!nomeValido(nome)) {
